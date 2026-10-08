@@ -1,5 +1,6 @@
 package com.productapp.service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -54,12 +55,17 @@ public class ProductServiceImpl implements IProductService {
 	@Override
 	public List<Product> getAllProducts() {
 		List<Product> products = productRepository.findAll();
+		products = products.stream().sorted(Comparator.comparing(Product::getProductName)).toList();
 		return products;
 	}
 
 	@Override
 	public List<Product> getByLesserPrice(double price) throws ProductNotFoundException {
 		List<Product> products = productRepository.findByPriceLessThan(price);
+		if (products.isEmpty())
+			throw new ProductNotFoundException("No Products found in this lesser price");
+
+		products = products.stream().sorted(Comparator.comparing(Product::getProductName)).toList();
 
 		return products;
 	}
@@ -67,18 +73,33 @@ public class ProductServiceImpl implements IProductService {
 	@Override
 	public List<Product> getByBrand(String brand) throws ProductNotFoundException {
 		List<Product> products = productRepository.findByBrand(brand);
+		if (products.isEmpty())
+			throw new ProductNotFoundException("No Products found in this brand" + brand);
+
+		products = products.stream().sorted(Comparator.comparing(Product::getProductName)).toList();
+
 		return products;
 	}
 
 	@Override
 	public List<Product> getByProductNameContains(String productname) {
 		List<Product> products = productRepository.findByProductNameContains(productname);
+		if (products.isEmpty())
+			throw new ProductNotFoundException("No Products found in this name contains");
+
+		products = products.stream().sorted(Comparator.comparing(Product::getProductName)).toList();
+
 		return products;
 	}
 
 	@Override
 	public List<Product> getByBrandPrice(String brand, double cost) {
 		List<Product> products = productRepository.findByBrandPrice(brand, cost);
+		if (products.isEmpty())
+			throw new ProductNotFoundException("No Products found in this barnd and  price");
+
+		products = products.stream().sorted(Comparator.comparing(Product::getProductName)).toList();
+
 		return products;
 	}
 
@@ -86,12 +107,22 @@ public class ProductServiceImpl implements IProductService {
 	public List<Product> getByCatBrand(String category, String brand) {
 		List<Product> products = productRepository.findByCatBrand(category, brand);
 
+		if (products.isEmpty())
+			throw new ProductNotFoundException("No Products found in this category and barnd");
+
+		products = products.stream().sorted(Comparator.comparing(Product::getProductName)).toList();
+
 		return products;
 	}
 
 	@Override
 	public List<Product> getByCatPrice(String category, double price) {
 		List<Product> products = productRepository.findByCatPrice(category, price);
+		if (products.isEmpty())
+			throw new ProductNotFoundException("No Products found in this category and price");
+
+		products = products.stream().sorted(Comparator.comparing(Product::getProductName)).toList();
+
 		return products;
 	}
 
